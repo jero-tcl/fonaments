@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2n Batxillerat Artístic · Reunió de famílies · Ondara</title>
+<style>
+:root{
+  --ink:#17171a; --muted:#62626a; --paper:#fbfaf8; --card:#fff;
+  --purple:#54206f; --blue:#168fc9; --violet:#7b3aa0;
+  --line:#e9e5ea; --soft:#f1edf4; --accent:#5d2b79;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#111;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow:hidden}
+.deck{height:100vh;width:100vw;position:relative;background:var(--paper)}
+.slide{position:absolute;inset:0;display:none;padding:6.5vh 8vw 7vh;overflow:hidden;background:var(--paper)}
+.slide.active{display:flex;flex-direction:column}
+.slide:after{content:"";position:absolute;right:-8vw;bottom:-16vh;width:32vw;height:32vw;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(123,58,160,.10),rgba(22,143,201,.035) 45%,transparent 68%);pointer-events:none}
+.brand{position:absolute;top:3.2vh;right:4vw;width:145px;opacity:.9}
+.brand img{width:100%;display:block}
+.kicker{font-size:clamp(13px,1.3vw,18px);font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--purple);margin-bottom:1.4vh}
+h1{font-size:clamp(40px,5.5vw,84px);line-height:.98;margin:0 0 2.2vh;letter-spacing:-.045em;max-width:1000px}
+h2{font-size:clamp(34px,4.2vw,64px);line-height:1;margin:0 0 3vh;letter-spacing:-.04em}
+h3{font-size:clamp(22px,2.2vw,34px);margin:.2em 0 .6em}
+p,li{font-size:clamp(17px,1.55vw,24px);line-height:1.42}
+.lead{font-size:clamp(21px,2vw,31px);line-height:1.35;max-width:850px;color:#37373d}
+.small{font-size:clamp(13px,1.1vw,17px);color:var(--muted)}
+.grid{display:grid;gap:1.5vw;position:relative;z-index:1}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:22px;padding:2.1vw;box-shadow:0 8px 30px rgba(30,20,40,.045)}
+.card.accent{border-top:6px solid var(--purple)}
+.card.blue{border-top:6px solid var(--blue)}
+.card h3{margin-top:0}
+.tag{display:inline-block;padding:.45em .8em;border-radius:999px;background:var(--soft);color:var(--purple);font-weight:800;font-size:14px;margin:.2em .2em .2em 0}
+ul{padding-left:1.1em;margin:.4em 0}
+li{margin:.35em 0}
+.quote{border-left:6px solid var(--purple);padding:1.2em 1.4em;background:#f5f1f7;border-radius:0 18px 18px 0;font-size:clamp(22px,2.2vw,34px);line-height:1.25;max-width:1000px;position:relative;z-index:1}
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:1vw;position:relative;z-index:1}
+.timeline .event{padding:1.25vw;border:1px solid var(--line);border-radius:18px;background:#fff;min-height:125px}
+.event .date{font-size:clamp(20px,1.8vw,29px);font-weight:900;color:var(--purple)}
+.event .name{font-size:clamp(15px,1.3vw,20px);font-weight:700;margin-top:.4em}
+.route{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3vw;position:relative;z-index:1}
+.route .way{padding:1.8vw;border-radius:24px;background:#fff;border:1px solid var(--line);min-height:210px}
+.way .icon{font-size:42px}
+.way .title{font-size:clamp(22px,2vw,31px);font-weight:900;margin:.5em 0}
+.way .sub{font-size:clamp(15px,1.25vw,19px);color:var(--muted);line-height:1.4}
+.footer{position:absolute;left:4vw;bottom:2.5vh;color:#85818a;font-size:12px;z-index:5}
+.counter{position:absolute;right:4vw;bottom:2.5vh;color:#85818a;font-size:12px;z-index:5}
+.controls{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:7px;z-index:20;opacity:.7}
+.controls button{border:1px solid #d8d3da;background:#fff;border-radius:10px;padding:7px 10px;cursor:pointer}
+.controls button:hover{background:#f1edf4}
+.cover{justify-content:center;padding-left:10vw}
+.cover .logo{width:min(430px,48vw);margin-bottom:4vh}
+.cover .logo img{width:100%;display:block}
+.cover h1{max-width:900px}
+.cover .subline{font-size:clamp(19px,1.7vw,27px);color:var(--muted)}
+.cover .rule{width:90px;height:7px;border-radius:10px;background:linear-gradient(90deg,var(--purple),var(--blue));margin:3vh 0}
+.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:3vw;position:relative;z-index:1}
+.big-number{font-size:clamp(48px,6vw,90px);font-weight:950;color:var(--purple);line-height:.9}
+.subjects{display:grid;grid-template-columns:1fr 1fr;gap:.7vw 2vw;position:relative;z-index:1}
+.subjects .subject{padding:.65em 0;border-bottom:1px solid var(--line);font-size:clamp(16px,1.35vw,21px)}
+.subjects .hours{color:var(--purple);font-weight:900;float:right}
+.note{margin-top:auto;position:relative;z-index:1}
+.linkbtn{display:inline-flex;align-items:center;gap:.5em;text-decoration:none;background:var(--purple);color:white;padding:.75em 1em;border-radius:12px;font-weight:800;margin-top:1em}
+.linkbtn:hover{background:#421856}
+.center{justify-content:center}
+.final{text-align:center;align-items:center}
+.final .logo{width:min(360px,45vw);margin:1vh auto 4vh}
+.final h2{max-width:900px}
+@media(max-width:800px){
+ .slide{padding:7vh 7vw 8vh}
+ .grid.two,.grid.three,.timeline,.route,.two-cols,.subjects{grid-template-columns:1fr}
+ .brand{width:110px}
+ .card{padding:5vw}
+}
+
+.calendar-link{margin-top:22px;display:flex;align-items:center;gap:16px;padding:16px 20px;border:2px solid var(--accent);border-radius:16px;background:linear-gradient(135deg,#f3efff,#fff);color:#17141f;text-decoration:none;box-shadow:0 8px 22px rgba(91,63,140,.12);transition:.2s ease}
+.calendar-link:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(91,63,140,.18)}
+.calendar-link .cal-icon{font-size:30px}.calendar-link strong{display:block;font-size:15px;letter-spacing:.04em}.calendar-link small{display:block;margin-top:3px;font-size:12px;opacity:.68}.calendar-link .arrow{margin-left:auto;font-size:24px;color:var(--accent)}
+
+    .optative-blocks .optative {
+      display:flex;
+      flex-direction:column;
+      gap:.35rem;
+    }
+    .optative-blocks .block-label {
+      font-size:.78rem;
+      font-weight:600;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .optative-blocks .option-list {
+      font-size:1rem;
+      font-weight:500;
+      line-height:1.45;
+      color:var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main class="deck" aria-label="Presentació reunió de famílies 2n Batxillerat Artístic">
+
+<section class="slide active cover">
+  <div class="logo"><img src="assets/logo-ondara.png" alt="Escola d'art Ondara"></div>
+  <div class="kicker">Reunió de famílies · Curs 2026–2027</div>
+  <h1>2n de Batxillerat Artístic</h1>
+  <div class="rule"></div>
+  <div class="subline">Arts Plàstiques · Arts Escèniques</div>
+  <div class="subline">Tutor: Jero</div>
+  <div class="footer">Escola d'Art Ondara · Tàrrega</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">01 · Benvinguda</div>
+  <h2>Què volem compartir avui?</h2>
+  <div class="grid three">
+    <div class="card accent"><h3>El curs</h3><p>Com afrontem 2n i què implica aquest últim curs de Batxillerat.</p></div>
+    <div class="card blue"><h3>L'acompanyament</h3><p>Com fem el seguiment, com ens comuniquem i quin paper té la família.</p></div>
+    <div class="card accent"><h3>El que ve després</h3><p>Com plantegem l'orientació i quines opcions tenen al final de 2n.</p></div>
+  </div>
+  <div class="note quote">L'objectiu és que alumnat, famílies i centre compartim expectatives i sapiguem què passarà al llarg del curs.</div>
+  <div class="counter"></div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">02 · El curs</div>
+  <h2>2n és un curs de consolidació</h2>
+  <div class="two-cols">
+    <div class="card accent">
+      <div class="big-number">01</div>
+      <h3>Primer objectiu: el primer trimestre</h3>
+      <p>Al setembre no volem que l'alumnat visqui el curs com una cursa cap al final. El primer objectiu és <strong>fer un bon primer trimestre</strong>, consolidar ritmes i detectar necessitats.</p>
+    </div>
+    <div class="card blue">
+      <div class="big-number">02</div>
+      <h3>Després, obrir el focus</h3>
+      <p>A partir de gener, l'orientació cap al curs següent s'intensifica de manera <strong>gradual però ferma</strong>, sense perdre de vista l'exigència acadèmica de 2n.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">03 · Les dues vies</div>
+  <h2>Dos itineraris, una mateixa mirada artística</h2>
+  <div class="grid two">
+    <div class="card accent">
+      <span class="tag">Arts Plàstiques</span>
+      <h3>Plàstiques, imatge i disseny</h3>
+      <p>Un itinerari orientat al desenvolupament del pensament visual, la pràctica artística, el disseny i els llenguatges gràfico-plàstics.</p>
+    </div>
+    <div class="card blue">
+      <span class="tag">Arts Escèniques</span>
+      <h3>Arts escèniques</h3>
+      <p>Un itinerari centrat en la pràctica escènica, la veu, la literatura dramàtica i els llenguatges de l'escena.</p>
+    </div>
+  </div>
+  <div class="note quote">En tots dos casos busquem autonomia, capacitat de treball, criteri, creativitat i responsabilitat.</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">04 · Matèries</div>
+  <h2>Com s'organitza 2n?</h2>
+  <div class="two-cols">
+    <div>
+      <h3>Matèries comunes</h3>
+      <div class="subjects">
+        <div class="subject">Tutoria <span class="hours">1 h</span></div>
+        <div class="subject">Català <span class="hours">2 h</span></div>
+        <div class="subject">Castellà <span class="hours">2 h</span></div>
+        <div class="subject">Anglès <span class="hours">3 h</span></div>
+        <div class="subject">Història <span class="hours">3 h</span></div>
+        <div class="subject">Història de la Filosofia <span class="hours">3 h</span></div>
+      </div>
+    </div>
+    <div>
+      <h3>Matèries artístiques</h3>
+      <div class="subjects">
+        <div class="subject">Fonaments Artístics <span class="hours">4 h</span></div>
+        <div class="subject">Arts Escèniques 2 <span class="hours">4 h</span></div>
+      </div>
+      <h3 style="margin-top:1.4em">Tres blocs d’optatives</h3>
+      <div class="subjects optative-blocks">
+        <div class="subject optative"><span class="block-label">Bloc 1 · 4 h</span><span class="option-list">Dibuix Artístic 2 · Literatura Dramàtica</span></div>
+        <div class="subject optative"><span class="block-label">Bloc 2 · 4 h</span><span class="option-list">Tècniques Graficoplàstiques 2 · Dibuix Tècnic 2 · Arts Escèniques</span></div>
+        <div class="subject optative"><span class="block-label">Bloc 3 · 4 h</span><span class="option-list">Cor i Tècnica Vocal 2 · Disseny</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="small note">Les matèries de modalitat i optatives s’organitzen en tres blocs d’elecció, amb les coincidències horàries que determina la graella del centre.</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">05 · Seguiment</div>
+  <h2>Què demanem a l'alumnat?</h2>
+  <div class="grid two">
+    <div class="card accent"><h3>Constància</h3><ul><li>Treball regular, no només abans dels exàmens.</li><li>Compliment dels terminis.</li><li>Preparació de proves i lliuraments.</li></ul></div>
+    <div class="card blue"><h3>Autonomia</h3><ul><li>Organitzar-se i assumir responsabilitats.</li><li>Acceptar correccions i revisar el treball.</li><li>Demanar ajuda quan apareix una dificultat.</li></ul></div>
+    <div class="card blue"><h3>Assistència</h3><ul><li>Assistència regular i puntualitat.</li><li>Justificació de les absències.</li><li>Participació activa en el treball d'aula.</li></ul></div>
+    <div class="card accent"><h3>Actitud</h3><ul><li>Compromís amb el propi procés.</li><li>Respecte pels companys i el professorat.</li><li>Capacitat de perseverar.</li></ul></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">06 · Avaluació</div>
+  <h2>Fer seguiment abans d'arribar al final</h2>
+  <div class="grid three">
+    <div class="card accent"><h3>Procés</h3><p>El treball quotidià i l'evolució tenen un paper important, especialment en les matèries artístiques.</p></div>
+    <div class="card blue"><h3>Resultats</h3><p>Exàmens, projectes, exercicis i altres evidències d'aprenentatge segons cada matèria.</p></div>
+    <div class="card accent"><h3>Reacció a temps</h3><p>Quan apareix una dificultat, és millor intervenir durant el curs que esperar a l'últim moment.</p></div>
+  </div>
+  <div class="note quote">A 2n, l'objectiu no és «salvar» el curs al final: és construir-lo bé des del principi.</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">07 · Comunicació</div>
+  <h2>Família ↔ centre</h2>
+  <div class="two-cols">
+    <div class="card accent">
+      <h3>Gescola</h3>
+      <p><strong>Gescola és el canal de comunicació amb les famílies.</strong></p>
+      <ul><li>Informacions del centre.</li><li>Comunicacions relacionades amb l'alumnat.</li><li>Seguiment quan sigui necessari.</li></ul>
+    </div>
+    <div class="card blue">
+      <h3>Quan cal contactar?</h3>
+      <p>Davant d'una dificultat acadèmica, personal o d'organització que pugui afectar el curs, és preferible comunicar-la aviat.</p>
+      <p class="small">La comunicació és una eina d'acompanyament, no només de resposta a problemes.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">08 · Orientació</div>
+  <h2>Primer, fer un bon 1r trimestre.</h2>
+  <p class="lead">Des de l'Ondara plantegem l'orientació de manera progressiva: primer consolidem el curs i, a partir de gener, iniciem amb més intensitat el procés de presa de decisions.</p>
+  <div class="grid two">
+    <div class="card accent">
+      <span class="tag">Setembre → desembre</span>
+      <h3>Posar el focus en el curs</h3>
+      <p>Treballar, conèixer el punt de partida de cada alumne/a, consolidar hàbits i fer un bon primer trimestre.</p>
+    </div>
+    <div class="card blue">
+      <span class="tag">A partir de gener</span>
+      <h3>Orientació gradual però ferma</h3>
+      <p>Informació, reflexió i presa de decisions mitjançant orientació <strong>grupal i individual</strong>.</p>
+    </div>
+  </div>
+  <div class="note small">El procés es fa de manera conjunta i coordinada entre tutoria i la psicopedagoga del centre, <strong>Antonieta Miret</strong>. Coordinadora de Batxillerat: <strong>Marta Agustí</strong>.</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">09 · Després de 2n</div>
+  <h2>No hi ha un únic camí</h2>
+  <div class="route">
+    <div class="way">
+      <div class="icon">🎓</div><div class="title">Universitat</div>
+      <div class="sub">Accés mitjançant PAU i procés de preinscripció universitària.</div>
+    </div>
+    <div class="way">
+      <div class="icon">🎨</div><div class="title">ESDAPC</div>
+      <div class="sub">Ensenyaments Artístics Superiors de Disseny · prova específica d'accés.</div>
+    </div>
+    <div class="way">
+      <div class="icon">🏫</div><div class="title">CFGS artístics</div>
+      <div class="sub">Al mateix centre: Gràfica Publicitària · Escultura Aplicada a l'Espectacle · Ceràmica Artística.</div>
+    </div>
+  </div>
+  <div class="note quote">No cal tenir avui la decisió final. Sí que cal arribar al moment de decidir amb informació, temps i acompanyament.</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">10 · Calendari</div>
+  <h2>Les dates que convé tenir al radar</h2>
+  <div class="timeline">
+    <div class="event"><div class="date">7 set.</div><div class="name">Inici de les classes de Batxillerat</div></div>
+    <div class="event"><div class="date">17 nov.</div><div class="name">Avaluació 1r trimestre</div></div>
+    <div class="event"><div class="date">17 febr.</div><div class="name">Avaluació 2n trimestre</div></div>
+    <div class="event"><div class="date">12 maig</div><div class="name">Avaluació final de 2n</div></div>
+    <div class="event"><div class="date">1–3 juny</div><div class="name">PAU · convocatòria ordinària</div></div>
+    <div class="event"><div class="date">1a/2a setmana juny*</div><div class="name">Prova específica ESDAPC</div></div>
+    <div class="event"><div class="date">8–10 juny</div><div class="name">PAU · tribunal especial / incidències</div></div>
+    <div class="event"><div class="date">10 juny</div><div class="name">Avaluació extraordinària de 2n</div></div>
+    <div class="event"><div class="date">6–8 juliol</div><div class="name">PAU · convocatòria extraordinària</div></div>
+  </div>
+  <div class="small note">* Data ESDAPC pendent de publicació oficial. Les dates de PAU indicades corresponen a la informació disponible per a la convocatòria 2027.</div>
+  <a class="calendar-link" href="assets/calendari-ondara-2026-27.pdf" target="_blank" rel="noopener"><span class="cal-icon">📅</span><span><strong>CONSULTA EL CALENDARI COMPLET</strong><small>Calendari acadèmic del centre · PDF</small></span><span class="arrow">↗</span></a>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">11 · PAU i ESDAPC</div>
+  <h2>El tram final del curs</h2>
+  <div class="grid two">
+    <div class="card accent">
+      <h3>PAU · juny 2027</h3>
+      <p><strong>Ordinària:</strong> 1, 2 i 3 de juny.</p>
+      <p><strong>Tribunal especial / incidències:</strong> 8, 9 i 10 de juny.</p>
+      <p><strong>Extraordinària:</strong> 6, 7 i 8 de juliol.</p>
+    </div>
+    <div class="card blue">
+      <h3>ESDAPC</h3>
+      <p>La prova específica d'accés encara no té data fixada per al 2027.</p>
+      <p>Com a orientació, habitualment se situa a la <strong>primera o segona setmana de juny</strong>.</p>
+      <p class="small">Quan es publiqui la convocatòria, caldrà consultar la data oficial.</p>
+    </div>
+  </div>
+  <div class="note small">La data límit indicada per notificar les notes del Batxillerat extraordinari és el <strong>21 de juny de 2027</strong>.</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">12 · El paper de les famílies</div>
+  <h2>Acompanyar sense substituir</h2>
+  <div class="grid three">
+    <div class="card accent"><h3>🕰️ Hàbits</h3><p>Afavorir rutines, descans i temps de treball.</p></div>
+    <div class="card blue"><h3>🧭 Autonomia</h3><p>Donar responsabilitat a l'alumne/a sobre el seu propi procés.</p></div>
+    <div class="card accent"><h3>💬 Comunicació</h3><p>Compartir amb el centre les dificultats que puguin afectar el curs.</p></div>
+  </div>
+  <div class="quote note">La família no ha de fer el seguiment acadèmic en lloc de l'alumne: l'ha d'ajudar a adquirir autonomia.</div>
+</section>
+
+<section class="slide">
+  <div class="brand"><img src="assets/logo-ondara.png" alt=""></div>
+  <div class="kicker">13 · Contacte</div>
+  <h2>Parlem quan calgui</h2>
+  <div class="card accent" style="margin-bottom:18px">
+    <h3>Via principal · Gescola</h3>
+    <p><strong>Gescola és el canal de referència per a la comunicació habitual amb les famílies.</strong></p>
+    <p class="small">Informacions, avisos, comunicacions i seguiment del curs.</p>
+  </div>
+  <div class="grid two">
+    <div class="card">
+      <h3>Tutoria</h3>
+      <p><strong>Jero</strong></p>
+      <p><a class="linkbtn" href="mailto:jmart127@xtec.cat">✉ jmart127@xtec.cat</a></p>
+    </div>
+    <div class="card">
+      <h3>Escola d’Art Ondara</h3>
+      <p><strong>Tel. 973 31 04 86</strong></p>
+      <p class="small">Per a qüestions generals del centre o quan calgui contactar amb l’escola.</p>
+    </div>
+  </div>
+  <div class="note quote">També em podeu contactar per correu electrònic o a través del telèfon de l’escola quan sigui necessari.</div>
+</section>
+
+<section class="slide final">
+  <div class="logo"><img src="assets/logo-ondara.png" alt="Escola d'art Ondara"></div>
+  <div class="kicker">14 · Per acabar</div>
+  <h2>2n és un final d’etapa, però sobretot és un pas cap al que ve després.</h2>
+  <p class="lead">El nostre objectiu és arribar al final de curs amb un alumnat que hagi crescut en autonomia, criteri i confiança per prendre la seva pròxima decisió.</p>
+  <h3 style="margin-top:3vh">Gràcies per la vostra confiança.</h3>
+  <p class="small">Preguntes i conversa amb les famílies</p>
+</section>
+
+<div class="controls" aria-label="Controls de presentació">
+  <button id="prev" aria-label="Anterior">←</button>
+  <button id="next" aria-label="Següent">→</button>
+</div>
+</main>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let current=0;
+const counter=document.querySelectorAll('.counter');
+function show(n){
+  current=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===current));
+  counter.forEach(c=>c.textContent=`${current+1} / ${slides.length}`);
+  history.replaceState(null,'',`#${current+1}`);
+}
+function next(){show(current+1)}
+function prev(){show(current-1)}
+document.getElementById('next').onclick=next;
+document.getElementById('prev').onclick=prev;
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();next()}
+  if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
+  if(e.key==='Home'){e.preventDefault();show(0)}
+  if(e.key==='End'){e.preventDefault();show(slides.length-1)}
+});
+const hash=parseInt(location.hash.slice(1),10);
+if(hash>=1&&hash<=slides.length) show(hash-1); else show(0);
+</script>
+</body>
+</html>
