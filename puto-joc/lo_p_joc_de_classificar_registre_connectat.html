@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lo p*** joc de classificar</title>
+<style>
+  :root { --ink:#20243a; --paper:#f5f4fa; --panel:#ffffff; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background:linear-gradient(145deg,#f0eff8,#e4edf5); color:var(--ink); font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; display:flex; justify-content:center; padding:18px; }
+  .app { width:min(100%,1240px); }
+  header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  h1 { margin:0 0 4px; font-size:clamp(1.5rem,4vw,2.2rem); letter-spacing:-.04em; }
+  .subtitle { margin:0; color:#62677d; }
+  .stats { display:flex; gap:8px; flex-wrap:wrap; }
+  .stat { background:#fff; padding:9px 14px; border-radius:14px; box-shadow:0 4px 14px #29345a12; min-width:82px; }
+  .stat small { display:block; color:#73788c; font-size:.72rem; text-transform:uppercase; letter-spacing:.07em; }
+  .stat strong { font-size:1.25rem; }
+  .game-shell { background:#fff; border-radius:22px; padding:12px; box-shadow:0 16px 40px #29345a16; }
+  .game-main { display:grid; grid-template-columns:minmax(0,1fr) 285px; gap:14px; align-items:stretch; }
+  .key-questions { background:#f7f6fc; border:1px solid #e4e0f0; border-radius:15px; padding:16px; color:#34384f; }
+  .key-questions h3 { margin:0 0 8px; font-size:1rem; line-height:1.2; }
+  .key-questions .intro { margin:0 0 10px; color:#686d82; font-size:.83rem; line-height:1.35; }
+  .key-questions .rom { color:#765198; }
+  .key-questions .real { color:#397b8b; }
+  .visual-compare { display:grid; gap:5px; }
+  .compare-head { display:grid; grid-template-columns:25px 1fr 1fr; gap:5px; align-items:center; font-size:.68rem; line-height:1.15; }
+  .compare-head b { text-align:center; padding:7px 3px; border-radius:8px; background:#fff; }
+  .compare-row { display:grid; grid-template-columns:25px 1fr 1fr; gap:5px; align-items:center; background:#fff; border:1px solid #e7e5f0; border-radius:8px; padding:7px 5px; font-size:.72rem; line-height:1.2; }
+  .compare-row .question-icon { grid-column:1; grid-row:1 / span 2; font-size:1.05rem; text-align:center; }
+  .compare-row b { grid-column:2 / 4; font-size:.68rem; color:#535970; }
+  .compare-row .rom, .compare-row .real { font-weight:650; }
+  .compare-row .rom { grid-column:2; }
+  .compare-row .real { grid-column:3; }
+  .key-questions .note { margin:8px 0 0; padding-top:9px; border-top:1px solid #e2deed; color:#656b80; font-size:.78rem; line-height:1.35; }
+  .concept-map { background:#f7f6fc; border:1px solid #e4e0f0; border-radius:15px; padding:12px; color:#34384f; }
+  .concept-map h3 { margin:0 0 8px; font-size:1rem; }
+  .map-root { text-align:center; font-size:.78rem; font-weight:900; letter-spacing:.03em; color:#fff; background:#34384f; border-radius:9px; padding:7px 5px; margin-bottom:8px; }
+  .map-branch-title { text-align:center; font-size:.82rem; font-weight:900; color:#555b70; text-transform:uppercase; letter-spacing:.07em; margin:9px 0 7px; }
+  .map-branch-title.romanticisms-title { font-size:.82rem; font-weight:900; color:#555b70; background:transparent; border:0; border-radius:0; padding:0; margin:9px 0 7px; letter-spacing:.07em; box-shadow:none; }
+  .map-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+  .map-node { border-radius:9px; padding:7px 6px; border:1px solid #e4e0f0; background:#fff; min-width:0; line-height:1.15; }
+  .map-node b { display:block; font-size:.68rem; margin-bottom:3px; }
+  .map-node span { display:block; font-size:.63rem; color:#62677d; }
+  .map-node.fr { border-top:3px solid #9164ad; } .map-node.en { border-top:3px solid #528c9c; }
+  .map-node.de { border-top:3px solid #6d79b7; } .map-node.pr { border-top:3px solid #4e966f; }
+  .map-node.na { border-top:3px solid #b38a62; } .map-node.cl { border-top:3px solid #a18a59; }
+  .map-node.go { border-top:3px solid #9a555d; } .map-node.re { border-top:3px solid #437b71; }
+  .map-tip { font-size:.72rem; text-align:center; color:#656b80; margin:8px 0 0; font-weight:650; }
+  .arena { position:relative; height:clamp(340px,58vh,520px); min-height:340px; overflow:hidden; border-radius:15px; background:linear-gradient(#f8f9ff,#f1f4fb); border:1px solid #e5e8f2; }
+  .arena:before { content:""; position:absolute; inset:0; background-image:linear-gradient(to right,#dfe4f0 1px,transparent 1px),linear-gradient(to bottom,#dfe4f0 1px,transparent 1px); background-size:50px 50px; opacity:.35; pointer-events:none; }
+  .lane-guides { position:absolute; inset:0; display:grid; grid-template-columns:repeat(var(--lane-count,3),1fr); pointer-events:none; }
+  .lane-guides span { border-right:1px dashed #cfd5e5; }
+  .lane-guides span:last-child { border:0; }
+  .artwork-fullscreen { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#e8e6e0; z-index:1; display:none; }
+  .falling { position:absolute; width:min(44%, 270px); min-height:54px; transform:translateX(-50%); z-index:5; background:rgba(255,255,255,.97); border:2px solid #fff; border-radius:10px; box-shadow:0 5px 16px #10152865; padding:6px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:3px; color:#20243a; }
+  .falling .art-title { font-size:clamp(11px,1.35vw,15px); line-height:1.15; font-weight:800; }
+  .falling .art-meta { font-size:clamp(10px,1.1vw,12px); line-height:1.2; font-weight:650; color:#50566c; }
+  .sacks { grid-template-columns:repeat(var(--lane-count, 3),minmax(0,1fr)); }
+  .answer-feedback { position:absolute; z-index:6; left:50%; top:12px; transform:translateX(-50%); width:min(92%,520px); max-height:calc(100% - 105px); overflow:hidden; padding:10px 14px; border-radius:12px; background:#fff8e7; border:2px solid #e1a72b; box-shadow:0 5px 18px #10152840; color:#292d48; text-align:center; font-size:clamp(12px,1.5vw,16px); font-weight:750; line-height:1.35; display:none; pointer-events:none; }
+  .answer-feedback.show { display:flex; flex-direction:column; align-items:center; gap:6px; animation:feedbackIn .18s ease-out; }
+  .answer-feedback .feedback-art { display:block; max-width:100%; width:auto; height:auto; max-height:clamp(90px,22vh,180px); object-fit:contain; border-radius:6px; background:#e8e6e0; }
+  .answer-feedback .feedback-title { font-weight:850; font-size:clamp(13px,1.6vw,17px); }
+  @keyframes feedbackIn { from { opacity:0; transform:translate(-50%,-6px); } to { opacity:1; transform:translate(-50%,0); } }
+  .target-line { position:absolute; z-index:3; bottom:76px; left:0; right:0; border-top:2px dashed #aeb6cb; opacity:.8; }
+  .sacks { display:grid; grid-template-columns:repeat(var(--lane-count, 3),minmax(0,1fr)); gap:4px; position:absolute; z-index:4; bottom:7px; left:7px; right:7px; }
+  .sack { --c:#aaa; position:relative; z-index:4; min-width:0; height:61px; border:2px solid var(--c); border-radius:8px 8px 15px 15px; background:color-mix(in srgb,var(--c) 24%,white); box-shadow:0 2px 5px #20243a30; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:2px; transition:transform .08s, background .08s; }
+  .sack:before { content:""; position:absolute; top:-5px; left:4px; right:4px; height:8px; border:2px solid var(--c); border-radius:7px; background:color-mix(in srgb,var(--c) 24%,white); }
+  .sack .dot { width:9px; height:9px; border-radius:50%; background:var(--c); flex-shrink:0; }
+  .sack .flag { font-size:1rem; line-height:1; flex-shrink:0; }
+  .sack b { font-size:clamp(.46rem,1.15vw,.69rem); line-height:1.05; color:#20243a; font-weight:800; text-shadow:0 1px 0 #ffffff; text-align:center; padding:0 2px; overflow-wrap:anywhere; }
+  .sack.active { transform:translateY(-5px); background:color-mix(in srgb,var(--c) 28%,white); box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 20%,transparent); }
+  .sack.good { animation:good .25s; }
+  @keyframes good { 50% { transform:translateY(-9px) scale(1.06); } }
+  .arena.error-flash { animation:errorFlash .62s ease-out; }
+  @keyframes errorFlash {
+    0%, 45%, 100% { background-color:transparent; }
+    15%, 60% { background-color:rgba(255,35,50,.42); box-shadow:inset 0 0 0 999px rgba(255,35,50,.25); }
+    30%, 75% { background-color:transparent; box-shadow:none; }
+  }
+  .confetti-piece { position:absolute; top:38%; left:50%; width:9px; height:13px; z-index:4; pointer-events:none; border-radius:2px; animation:confettiBurst 850ms cubic-bezier(.12,.7,.25,1) forwards; }
+  @keyframes confettiBurst {
+    0% { transform:translate(-50%,-50%) rotate(0deg) scale(1); opacity:1; }
+    100% { transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(.7); opacity:0; }
+  }
+  @media (prefers-reduced-motion:reduce) { .arena.error-flash,.confetti-piece { animation-duration:.01ms; } }
+  .overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:5; background:#f6f7fbe8; padding:22px; text-align:center; }
+  .overlay.hidden { display:none; }
+  .modal { max-width:420px; }
+  .modal .emoji { font-size:2.7rem; }
+  .modal h2 { margin:5px 0 8px; font-size:1.6rem; }
+  .modal p { color:#656b80; line-height:1.5; margin:0 0 18px; }
+  button { border:0; border-radius:12px; padding:11px 17px; font:inherit; font-weight:750; cursor:pointer; background:#292d48; color:#fff; box-shadow:0 5px 12px #292d4825; }
+  button:hover { filter:brightness(1.12); }
+  .player-label { display:block; font-weight:750; text-align:left; margin:0 0 5px; font-size:.9rem; }
+  #playerName { width:100%; padding:11px 12px; border:1px solid #cbd0e0; border-radius:10px; font:inherit; margin-bottom:10px; background:white; color:#20243a; }
+  .player-error { color:#b42335 !important; font-weight:700; margin:8px 0 0 !important; }
+  .leaderboard { margin-top:14px; text-align:left; font-size:.8rem; color:#555b70; max-height:120px; overflow:auto; }
+  .leaderboard h3 { font-size:.85rem; margin:0 0 5px; }
+  .leaderboard ol { margin:0; padding-left:20px; }
+  .progress-stat { min-width:110px; }
+  .mode-choices {display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px;}
+  .mode-choices button {background:#4d5276;}
+  .controls { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 2px 2px; }
+  .hint { color:#656b80; font-size:.9rem; }
+  .mobile-controls { display:flex; gap:7px; }
+  .mobile-controls button { width:48px; padding:10px 0; font-size:1.2rem; touch-action:manipulation; }
+  .mobile-controls button:active { transform:scale(.96); }
+  .bottom-note { text-align:center; color:#73788c; font-size:.78rem; margin:12px 0 0; }
+  @media (max-width:850px) { .game-main {grid-template-columns:1fr;} .key-questions {order:2;} .arena {height:clamp(340px,58vh,520px);} }
+  @media (max-width:560px) { body{padding:7px}.app{width:100%}.game-shell{padding:5px}.arena{height:clamp(390px,66vh,520px)}.sacks{left:3px;right:3px;gap:2px}.sack{height:69px}.sack b{font-size:clamp(.4rem,1.7vw,.58rem);letter-spacing:-.04em}.sack .dot{width:6px;height:6px}.falling{width:58%;min-height:48px;padding:5px 7px;border-width:2px}.falling .art-title{font-size:11px}.falling .art-meta{font-size:10px}.controls{justify-content:center}.hint{width:100%;text-align:center;font-size:.78rem} }
+
+  .delivery-result{display:block;margin:16px auto 10px;padding:16px 18px;border-radius:14px;font-size:clamp(1.25rem,3vw,2rem);font-weight:1000;letter-spacing:.025em;text-align:center;line-height:1.15;border:3px solid;box-shadow:0 8px 24px #1112}
+  .delivery-result.invalid{background:#fff0f1;color:#a30e27;border-color:#d7193f;animation:invalidPulse 1.1s ease-in-out infinite alternate}
+  .delivery-result.valid{background:#e7f8ed;color:#126b39;border-color:#20a05a}
+  @keyframes invalidPulse{from{transform:scale(1);box-shadow:0 5px 15px #d7193f22}to{transform:scale(1.025);box-shadow:0 8px 26px #d7193f55}}
+  .result-detail{display:block;margin-top:9px;font-size:1rem;font-weight:700;letter-spacing:0}
+  @media(prefers-reduced-motion:reduce){.delivery-result.invalid{animation:none}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Lo p*** joc de classificar</h1>
+      <p class="subtitle">Tria nivell principiant o avançat i classifica les obres que van apareixent.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Punts</small><strong id="score">0</strong></div>
+      <div class="stat"><small>Errades / màx. 4</small><strong id="errors">0</strong></div>
+      <div class="stat"><small>Nivell</small><strong id="level">1</strong></div>
+      <div class="stat progress-stat"><small>Obres</small><strong id="progress">0/0</strong></div>
+    </div>
+  </header>
+  <div class="game-shell">
+    <div class="game-main">
+    <div class="arena" id="arena" aria-label="Zona de joc">
+      <div class="lane-guides"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <img class="artwork-fullscreen" id="artworkFullscreen" alt="Obra pictòrica actual">
+      <div class="answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div>
+      <div class="target-line"></div>
+      <div class="sacks" id="sacks"></div>
+      <div class="overlay" id="overlay">
+        <div class="modal">
+          <div class="emoji">🖼️ 🎨</div>
+          <label class="player-label" for="playerName">Selecciona el teu nom</label>
+          <select id="playerName" required>
+            <option value="" selected disabled>Tria el teu nom de la llista…</option>
+            <option value="Jana">Jana</option>
+            <option value="Joel">Joel</option>
+            <option value="Carla C.">Carla C.</option>
+            <option value="Laura">Laura</option>
+            <option value="Adama">Adama</option>
+            <option value="Anaclara">Anaclara</option>
+            <option value="Rodrigo">Rodrigo</option>
+            <option value="Emma">Emma</option>
+            <option value="Mireia">Mireia</option>
+            <option value="Miquel">Miquel</option>
+            <option value="Mar">Mar</option>
+            <option value="Saray G.">Saray G.</option>
+            <option value="Patricia">Patricia</option>
+            <option value="Laia">Laia</option>
+            <option value="Max">Max</option>
+            <option value="Denisa">Denisa</option>
+            <option value="Maria">Maria</option>
+            <option value="Mercè">Mercè</option>
+            <option value="Sira">Sira</option>
+            <option value="Carla M.">Carla M.</option>
+            <option value="Saray M.">Saray M.</option>
+            <option value="Pere">Pere</option>
+            <option value="Diana">Diana</option>
+            <option value="Vicente">Vicente</option>
+            <option value="Elisabeth">Elisabeth</option>
+            <option value="Elna">Elna</option>
+            <option value="Juna">Juna</option>
+            <option value="Marta">Marta</option>
+            <option value="Roxana">Roxana</option>
+            <option value="Jero (test)">Jero (test) — proves</option>
+          </select>
+          <h2 id="overlayTitle">Preparat?</h2>
+          <p id="overlayText">Tria una modalitat. En el nivell principiant classificaràs les obres en quatre grups; en l’avançat distingiràs les escoles i tendències concretes.</p>
+          <div id="modeChoices" class="mode-choices"><button id="beginnerBtn">Nivell principiant</button><button id="advancedBtn">Nivell avançat</button></div>
+          <button id="startBtn" style="display:none">Comença a jugar</button>
+          <p id="playerError" class="player-error" role="alert" style="display:none">Selecciona el teu nom abans de començar.</p>
+          <div id="leaderboard" class="leaderboard"></div>
+        </div>
+      </div>
+    </div>
+    <aside class="key-questions" id="keyQuestions" style="display:none" aria-label="Preguntes clau per diferenciar Romanticisme i Realisme">
+      <h3>🔎 Romanticisme o Realisme?</h3>
+      <p class="intro">Mira i decideix:</p>
+      <div class="visual-compare">
+        <div class="compare-head"><span></span><b class="rom">🌩️ ROMÀNTIC</b><b class="real">👁️ REALISTA</b></div>
+        <div class="compare-row"><span class="question-icon">❤️</span><b>Què domina?</b><span class="rom">Emoció</span><span class="real">Realitat</span></div>
+        <div class="compare-row"><span class="question-icon">🖼️</span><b>Què veus?</b><span class="rom">Drama, natura</span><span class="real">Feina, vida diària</span></div>
+        <div class="compare-row"><span class="question-icon">〰️</span><b>Com és?</b><span class="rom">Intens, mogut</span><span class="real">Observat, creïble</span></div>
+      </div>
+      <p class="note">💡 Busca 2 pistes visuals.</p>
+    </aside>
+    <aside class="concept-map" id="advancedMap" style="display:none" aria-label="Mapa conceptual de les categories del nivell avançat">
+      <h3>🧭 Mapa de classificació</h3>
+      <div class="map-root">PINTURA · SEGLE XIX</div>
+      <div class="map-branch-title romanticisms-title">🌩️ ROMANTICISMES 🌩️</div>
+      <div class="map-grid">
+        <div class="map-node fr"><b>🇫🇷 Francès</b><span>Delacroix · Géricault</span></div>
+        <div class="map-node en"><b>🇬🇧 Anglès</b><span>Turner · Constable · Füssli</span></div>
+        <div class="map-node de"><b>🇩🇪 Alemany</b><span>Friedrich · Runge</span></div>
+        <div class="map-node pr"><b>🌿 Prerafaelita</b><span>Rossetti · Millais · Hunt</span></div>
+        <div class="map-node na"><b>🕊️ Natzarè</b><span>Overbeck</span></div>
+      </div>
+      <div class="map-branch-title">ALTRES CATEGORIES</div>
+      <div class="map-grid">
+        <div class="map-node cl"><b>🏛️ Classicisme</b><span>Ingres</span></div>
+        <div class="map-node go"><b>🎨 Goya</b><span>Obres de Goya</span></div>
+        <div class="map-node re" style="grid-column:1 / -1"><b>👁️ Realisme</b><span>Courbet · Millet · Daumier · Corot</span></div>
+      </div>
+      <p class="map-tip">💡 Fixa’t en l’autor i l’escola artística.</p>
+    </aside>
+    </div>
+    <div class="controls">
+      <div class="hint">⌨️ Tecles <b>← →</b> o <b>A / D</b> · També pots tocar les fletxes.</div>
+      <div class="mobile-controls">
+        <button id="leftBtn" aria-label="Mou a l'esquerra">←</button>
+        <button id="rightBtn" aria-label="Mou a la dreta">→</button>
+        <button id="pauseBtn" title="Pausa">Ⅱ</button>
+      </div>
+    </div>
+  </div>
+  <p class="bottom-note">← → o A/D per moure l’obra · Mantén ESPAI per accelerar-ne la caiguda. Les obres provenen dels dos llistats facilitats. En nivell avançat s’exclouen les obres que no encaixen en les vuit categories.</p>
+</div>
+<script>
+(() => {
+  const categorySets = {"beginner":[{"name":"ROMANTICISME","hex":"#9164ad"},{"name":"REALISME","hex":"#528c9c"},{"name":"GOYA","hex":"#9a555d"},{"name":"ALTRES","hex":"#9a8b78"}],"advanced":[{"name":"ROMANTICISME FRANCÈS","hex":"#9164ad","flag":"🇫🇷"},{"name":"ROMANTICISME ANGLÈS","hex":"#528c9c","flag":"🇬🇧"},{"name":"ROMANTICISME ALEMANY","hex":"#6d79b7","flag":"🇩🇪"},{"name":"ROMANTICISME PRERAFAELITA","hex":"#4e966f"},{"name":"ROMANTICISME NATZARÈ","hex":"#b38a62"},{"name":"CLASSICISME","hex":"#a18a59"},{"name":"GOYA","hex":"#9a555d"},{"name":"REALISME","hex":"#437b71"}]};
+  const artworks = [{"title":"El rai de la medusa. Gericault (1819)","url":"https://upload.wikimedia.org/wikipedia/commons/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme francès","beginner":"Romanticisme"},{"title":"Nosaltres tres. Runge (1805)","url":"https://upload.wikimedia.org/wikipedia/commons/a/af/Philipp_Otto_Runge_Wir_drei.jpg?utm_source=es.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme alemany","beginner":"Romanticisme"},{"title":"El caminant sobre el mar de boira. Caspar Friedrich (1818)","url":"https://upload.wikimedia.org/wikipedia/commons/1/1e/Friedrich%2C_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme alemany","beginner":"Romanticisme"},{"title":"Les dones d'Alger. Delacroix (1834)","url":"https://upload.wikimedia.org/wikipedia/commons/7/74/Femmes_d%27Alger_dans_leur_appartement%2C_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_INV_3824.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme francès","beginner":"Romanticisme"},{"title":"La mort de Sardanàpal. Delacroix (1827)","url":"https://upload.wikimedia.org/wikipedia/commons/3/33/Eug%C3%A8ne_Delacroix_-_La_Mort_de_Sardanapale.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme francès","beginner":"Romanticisme"},{"title":"La massacre de Quios. Delacroix (1824)","url":"https://upload.wikimedia.org/wikipedia/commons/5/54/Sc%C3%A8ne_des_massacres_de_Scio.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme francès","beginner":"Romanticisme"},{"title":"Oficial de caçadors a la càrrega. Gericault (1812)","url":"https://upload.wikimedia.org/wikipedia/commons/7/7e/GericaultHorseman.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme francès","beginner":"Romanticisme"},{"title":"La gallina cega. Goya (1788)","url":"https://upload.wikimedia.org/wikipedia/commons/5/54/La_gallina_ciega_%28cart%C3%B3n_restaurado%29_por_Francisco_de_Goya.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Goya","beginner":"Goya"},{"title":"La maja desnuda. Goya (1797-1800)","url":"https://upload.wikimedia.org/wikipedia/commons/4/4c/Goya_Maja_naga2.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Goya","beginner":"Goya"},{"title":"La romeria de sant Isidre. Goya (1820-1823)","url":"https://upload.wikimedia.org/wikipedia/commons/e/ec/La_romer%C3%ADa_de_San_Isidro.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Goya","beginner":"Goya"},{"title":"La gran odalisca. Ingres (1814)","url":"https://upload.wikimedia.org/wikipedia/commons/d/df/La_grande_odalisque_-_Jean-Auguste_Dominique_Ingres_-_Mus%C3%A9e_du_Louvre_Peintures_RF_1158.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Classicisme","beginner":"Altres"},{"title":"Matí al Riesengebirge. Caspar Friedrich (1810-1811)","url":"https://upload.wikimedia.org/wikipedia/commons/3/3b/Morgen_im_Riesengebirge_%28C_D_Friedrich%29.jpg?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original","advanced":"Romanticisme alemany","beginner":"Romanticisme"},{"title":"Germània i Itàlia. Overbeck (1815-1828)","url":"https://upload.wikimedia.org/wikipedia/commons/a/a3/Italia_e_Germania.jpg?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original","advanced":"Romanticisme natzarè","beginner":"Romanticisme"},{"title":"El malson. Füssli (1781)","url":"https://upload.wikimedia.org/wikipedia/commons/5/56/John_Henry_Fuseli_-_The_Nightmare.JPG?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme anglès","beginner":"Romanticisme"},{"title":"El camp de blat. Constable (1826)","url":"https://upload.wikimedia.org/wikipedia/commons/e/ed/John_Constable_-_The_Cornfield.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme anglès","beginner":"Romanticisme"},{"title":"La carreta de fenc. Constable (1821)","url":"https://upload.wikimedia.org/wikipedia/commons/5/55/Constables_The_Hay_Wain.png?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme anglès","beginner":"Romanticisme"},{"title":"Ofèlia. Millais (1851)","url":"https://upload.wikimedia.org/wikipedia/commons/9/94/John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme prerafaelita","beginner":"Romanticisme"},{"title":"El Temerari remolcat a dic sec. Turner (1839)","url":"https://upload.wikimedia.org/wikipedia/commons/9/94/Turner%2C_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme anglès","beginner":"Romanticisme"},{"title":"Ecce Ancilla Domini. Rossetti (1850)","url":"https://upload.wikimedia.org/wikipedia/commons/0/08/Dante_Gabriel_Rossetti_-_Ecce_Ancilla_Domini%21_-_Google_Art_Project.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme prerafaelita","beginner":"Romanticisme"},{"title":"Pluja, vapor i velocitat. El gran ferrocarril de l'Oest. Turner (1844)","url":"https://upload.wikimedia.org/wikipedia/commons/9/96/Turner_-_Rain%2C_Steam_and_Speed_-_National_Gallery_file.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme anglès","beginner":"Romanticisme"},{"title":"El dos de maig de 1808 (o la revolta dels mamelucs). Goya (1814)","url":"https://upload.wikimedia.org/wikipedia/commons/7/76/El_dos_de_mayo_de_1808_en_Madrid.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Goya","beginner":"Goya"},{"title":"El tres de maig a Madrid. Goya (1814)","url":"https://upload.wikimedia.org/wikipedia/commons/3/3f/Francisco_de_Goya_y_Lucientes_-_Los_fusilamientos_del_tres_de_mayo_-_1814.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Goya","beginner":"Goya"},{"title":"Saturn devorant el seu fill. Goya (1819-1823)","url":"https://upload.wikimedia.org/wikipedia/commons/8/82/Francisco_de_Goya%2C_Saturno_devorando_a_su_hijo_%281819-1823%29.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Goya","beginner":"Goya"},{"title":"El despertar de la conciencia. Hunt (1853)","url":"https://upload.wikimedia.org/wikipedia/commons/8/83/William_Holman_Hunt_-_The_Awakening_Conscience_-_Google_Art_Project.jpg?utm_source=es.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme prerafaelita","beginner":"Romanticisme"},{"title":"El mar de gel. Friedrich (1823-1824)","url":"https://upload.wikimedia.org/wikipedia/commons/7/77/Friedrich%2C_Caspar_David_-_Eismeer.jpg?utm_source=es.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme alemany","beginner":"Romanticisme"},{"title":"Monjo vora el mar. Friedrich (1808-1810)","url":"https://upload.wikimedia.org/wikipedia/commons/f/f6/Friedrich%2C_Caspar_David_-_M%C3%B6nch_am_Meer_-_Alte_Nationalgalerie_in_Berlin.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme alemany","beginner":"Romanticisme"},{"title":"La familia de Carles IV. Goya (1800)","url":"https://upload.wikimedia.org/wikipedia/commons/7/74/La_familia_de_Carlos_IV%2C_por_Francisco_de_Goya.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Goya","beginner":"Goya"},{"title":"La llibretat guiant el poble. Delacroix (1830)","url":"https://upload.wikimedia.org/wikipedia/commons/0/02/La_Libert%C3%A9_guidant_le_peuple_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_129_-_apr%C3%A8s_restauration_2024.jpg?utm_source=ca.wikipedia.org&utm_campaign=imageinfo&utm_content=original","advanced":"Romanticisme francès","beginner":"Romanticisme"},{"title":"Catedral de Chartres. Corot. 1830","url":"https://upload.wikimedia.org/wikipedia/commons/e/e9/Camile_Corot_Chartres.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"L'home desesperat (autorretrat). Gustave Courbet. 1843–1845","url":"https://upload.wikimedia.org/wikipedia/commons/8/8f/Gustave_Courbet_-_Le_D%C3%A9sesp%C3%A9r%C3%A9_%281843%29.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"Els picapedrers. Gustave Courbet. 1849","url":"https://upload.wikimedia.org/wikipedia/commons/4/46/Gustave_Courbet_-_The_Stonebreakers_-_WGA05457.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"Sobretaula a Ornans. Gustave Courbet. 1848–1849","url":"https://upload.wikimedia.org/wikipedia/commons/f/fc/Gustave_Courbet_031.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"Enterrament a Ornans. Gustave Courbet. 1849–1850","url":"https://upload.wikimedia.org/wikipedia/commons/a/a0/Gustave_Courbet_-_A_Burial_at_Ornans_-_Google_Art_Project_2.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"L’home ferit (autorretrat). Gustave Courbet. 1855","url":"https://www.sapiens.cat/uploads/s1/14/13/20/0/gustave-courbet-l-home-ferit-1844-i-1854_76_1344x764.webp","advanced":"Realisme","beginner":"Realisme"},{"title":"L’estudi de l’artista. Gustave Courbet. 1855","url":"https://upload.wikimedia.org/wikipedia/commons/a/a4/Courbet_LAtelier_du_peintre.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"L’origen del món. Gustave Courbet. 1866","url":"https://upload.wikimedia.org/wikipedia/commons/6/6a/Origin-of-the-WorldFXD.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"Senyores al costat del Sena. Gustave Courbet. 1856","url":"https://upload.wikimedia.org/wikipedia/commons/2/28/Gustave_Courbet_027.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"El vagó de la tercera classe. Daumier. 1864","url":"https://upload.wikimedia.org/wikipedia/commons/2/2e/Honor%C3%A9_Daumier_034.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"El sembrador. Millet. 1850","url":"https://upload.wikimedia.org/wikipedia/commons/0/0b/Jean-Fran%C3%A7ois_Millet_%28II%29_013.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"Les espigadores. Millet. 1857","url":"https://upload.wikimedia.org/wikipedia/commons/1/1f/Jean-Fran%C3%A7ois_Millet_-_Gleaners_-_Google_Art_Project_2.jpg","advanced":"Realisme","beginner":"Realisme"},{"title":"L’àngelus. Millet. 1857–1859","url":"https://upload.wikimedia.org/wikipedia/commons/1/17/JEAN-FRAN%C3%87OIS_MILLET_-_El_%C3%81ngelus_%28Museo_de_Orsay%2C_1857-1859._%C3%93leo_sobre_lienzo%2C_55.5_x_66_cm%29.jpg","advanced":"Realisme","beginner":"Realisme"}];
+  let mode = 'beginner';
+  let categories = categorySets[mode];
+  const arena = document.getElementById('arena');
+  const sacks = document.getElementById('sacks');
+  const artworkFullscreen = document.getElementById('artworkFullscreen');
+  const answerFeedback = document.getElementById('answerFeedback');
+  const scoreEl = document.getElementById('score');
+  const errorsEl = document.getElementById('errors');
+  const levelEl = document.getElementById('level');
+  const progressEl = document.getElementById('progress');
+  const playerNameInput = document.getElementById('playerName');
+  const playerError = document.getElementById('playerError');
+  const leaderboardEl = document.getElementById('leaderboard');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlayTitle');
+  const overlayText = document.getElementById('overlayText');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const modeChoices = document.getElementById('modeChoices');
+  const beginnerBtn = document.getElementById('beginnerBtn');
+  const advancedBtn = document.getElementById('advancedBtn');
+  const keyQuestions = document.getElementById('keyQuestions');
+  const advancedMap = document.getElementById('advancedMap');
+  let lane = 3, score = 0, level = 1, running = false, paused = false;
+  let current = null, lastTime = 0, spawnWait = 0, raf = null;
+  let playerName = '', playQueue = [], totalInRound = 0, completedCount = 0;
+  let errorCount = 0, correctCount = 0, gameId = '', gameStartedAt = 0, gameRecorded = false;
+  const SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxcKYvKEYyR4ga--LZ4NXGaeFwDE-Ds_CORqjVw6_aqduDI8NLx9S8AXeVXcKmZ5__8UA/exec';
+  let audioContext = null;
+
+  // Sons generats al navegador: no cal descarregar cap fitxer d'àudio.
+  function playTone(frequency, duration, type = 'sine', volume = 0.08, delay = 0) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!audioContext) audioContext = new AudioCtx();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const startAt = audioContext.currentTime + delay;
+      osc.type = type; osc.frequency.setValueAtTime(frequency, startAt);
+      gain.gain.setValueAtTime(0.0001, startAt);
+      gain.gain.exponentialRampToValueAtTime(volume, startAt + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+      osc.connect(gain); gain.connect(audioContext.destination);
+      osc.start(startAt); osc.stop(startAt + duration + 0.03);
+    } catch (e) { /* Si el dispositiu no admet àudio, el joc continua igualment. */ }
+  }
+  function playSuccessSound() {
+    playTone(740, 0.16, 'triangle', 0.20);
+    playTone(1040, 0.22, 'triangle', 0.22, 0.10);
+  }
+  function playErrorSound() {
+    playTone(165, 0.28, 'sawtooth', 0.20);
+    playTone(95, 0.30, 'square', 0.14, 0.10);
+    playTone(70, 0.24, 'sawtooth', 0.11, 0.22);
+  }
+  function showConfetti() {
+    const palette = ['#f4c542','#e84b55','#f28c38','#9565d8','#39a96b','#3986e8','#ff70b5'];
+    for (let i = 0; i < 34; i++) {
+      const bit = document.createElement('i');
+      bit.className = 'confetti-piece';
+      bit.style.background = palette[Math.floor(Math.random() * palette.length)];
+      bit.style.setProperty('--dx', `${Math.round((Math.random() - 0.5) * arena.clientWidth * 0.9)}px`);
+      bit.style.setProperty('--dy', `${Math.round(100 + Math.random() * arena.clientHeight * 0.55)}px`);
+      bit.style.setProperty('--rot', `${Math.round(Math.random() * 900 - 450)}deg`);
+      bit.style.left = `${45 + Math.random() * 10}%`;
+      arena.appendChild(bit);
+      bit.addEventListener('animationend', () => bit.remove(), {once:true});
+    }
+  }
+  function showErrorFlash() {
+    arena.classList.remove('error-flash');
+    void arena.offsetWidth; // Reinicia l'animació si hi ha errors consecutius.
+    arena.classList.add('error-flash');
+    setTimeout(() => arena.classList.remove('error-flash'), 700);
+  }
+
+  function renderSacks() {
+    sacks.innerHTML = '';
+    categories.forEach((c, i) => {
+      const sack = document.createElement('div');
+      sack.className = 'sack';
+      sack.style.setProperty('--c', c.hex);
+      sack.dataset.lane = i;
+      sack.innerHTML = `${c.flag ? `<span class="flag" aria-hidden="true">${c.flag}</span>` : '<span class="dot"></span>'}<b>${c.name}</b>`;
+      sacks.appendChild(sack);
+    });
+    sackEls = [...sacks.children];
+    sacks.style.setProperty('--lane-count', categories.length);
+    document.querySelector('.lane-guides').style.gridTemplateColumns = `repeat(${categories.length},1fr)`;
+  }
+  let sackEls = [];
+
+  function updateStats() {
+    scoreEl.textContent = score;
+    errorsEl.textContent = errorCount;
+    level = 1 + Math.floor(score / 8);
+    levelEl.textContent = level;
+    progressEl.textContent = `${completedCount}/${totalInRound}`;
+  }
+  function move(dir) {
+    if (!running || paused) return;
+    lane = Math.max(0, Math.min(categories.length - 1, lane + dir));
+    positionSquare();
+    sackEls.forEach((el, i) => el.classList.toggle('active', i === lane));
+  }
+  function positionSquare() {
+    if (!current) return;
+    const width = arena.clientWidth;
+    current.el.style.left = ((lane + .5) / categories.length * width) + 'px';
+  }
+  function spawn() {
+    if (!playQueue.length) { endGame(true); return; }
+    const artwork = playQueue.shift();
+    answerFeedback.classList.remove('show');
+    answerFeedback.textContent = '';
+    const categoryName = mode === 'beginner' ? artwork.beginner : artwork.advanced;
+    const categoryIndex = categories.findIndex(c => c.name.toLowerCase() === categoryName.toLowerCase());
+    artworkFullscreen.src = artwork.url;
+    artworkFullscreen.alt = artwork.title;
+    artworkFullscreen.style.display = 'block';
+    const el = document.createElement('div');
+    el.className = 'falling';
+    const match = artwork.title.match(/^(.*)\.\s*([^(]+)\s*\(([^)]+)\)$/);
+    const title = match ? match[1] : artwork.title;
+    const author = match ? match[2].trim() : '';
+    const year = match ? match[3].trim() : '';
+    el.innerHTML = `<div class="art-title">${title}</div><div class="art-meta">${author}${author && year ? ' · ' : ''}${year}</div>`;
+    el.setAttribute('aria-label', `Fitxa de l’obra ${artwork.title}`);
+    arena.appendChild(el);
+    lane = Math.floor(Math.random() * categories.length);
+    current = {el, color:categoryIndex, y:-100, artwork};
+    positionSquare();
+    sackEls.forEach((s, i) => s.classList.toggle('active', i === lane));
+  }
+  function getRecords() {
+    try { return JSON.parse(localStorage.getItem('jocRomanticismeRecords') || '[]'); }
+    catch (e) { return []; }
+  }
+  function saveRecord() {
+    const records = getRecords();
+    records.push({name:playerName, score, mode:mode === 'beginner' ? 'Principiant' : 'Avançat', date:new Date().toLocaleDateString('ca-ES')});
+    records.sort((a,b) => b.score-a.score);
+    try { localStorage.setItem('jocRomanticismeRecords', JSON.stringify(records.slice(0,10))); } catch (e) {}
+    renderLeaderboard();
+  }
+  function renderLeaderboard() {
+    const records = getRecords();
+    leaderboardEl.innerHTML = records.length ? `<h3>Millors puntuacions en aquest navegador</h3><ol>${records.slice(0,5).map(r => `<li>${escapeHtml(r.name)} — ${r.score} punts (${r.mode})</li>`).join('')}</ol>` : '';
+  }
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+  function makeGameId() {
+    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `partida-${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
+  }
+  function saveLocalLog(payload) {
+    try {
+      const key = 'loPJocClassificarLocalLog';
+      const log = JSON.parse(localStorage.getItem(key) || '[]');
+      log.push(payload);
+      localStorage.setItem(key, JSON.stringify(log.slice(-5000)));
+    } catch (e) {}
+  }
+  function sendToSpreadsheet(payload) {
+    saveLocalLog(payload); // còpia local de seguretat
+    if (!SHEETS_WEB_APP_URL || SHEETS_WEB_APP_URL.includes('PASTE_GOOGLE_APPS_SCRIPT')) return;
+    try {
+      fetch(SHEETS_WEB_APP_URL, {
+        method: 'POST', mode: 'no-cors', keepalive: true,
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload)
+      }).catch(() => {});
+    } catch (e) {}
+  }
+  function logAnswer(artwork, selectedCategory, correctCategory, isCorrect) {
+    sendToSpreadsheet({
+      event: 'answer', gameId, name: playerName,
+      mode: mode === 'beginner' ? 'Principiant' : 'Avançat',
+      timestamp: new Date().toISOString(),
+      artwork: artwork.title, selectedCategory, correctCategory,
+      isCorrect, responseNumber: completedCount + 1,
+      elapsedSeconds: Math.max(0, Math.floor((Date.now() - gameStartedAt) / 1000))
+    });
+  }
+  function logGame(completed, reason) {
+    if (gameRecorded || !gameId) return;
+    gameRecorded = true;
+    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - gameStartedAt) / 1000));
+    sendToSpreadsheet({
+      event: 'game', gameId, name: playerName,
+      mode: mode === 'beginner' ? 'Principiant' : 'Avançat',
+      startedAt: new Date(gameStartedAt).toISOString(), endedAt: new Date().toISOString(),
+      elapsedSeconds, totalWorks: totalInRound, answeredWorks: completedCount,
+      correctCount, errorCount, score, completed, reason,
+      valid: completed && errorCount <= 4
+    });
+  }
+  function endGame(completed = false) {
+    if (!running && !paused) return;
+    running = false; paused = false;
+    logGame(completed, completed ? 'Partida completada' : 'Partida finalitzada');
+    if (current) { current.el.remove(); current = null; }
+    artworkFullscreen.style.display = 'none';
+    answerFeedback.classList.remove('show');
+    sackEls.forEach(s => s.classList.remove('active'));
+    const validDelivery = completed && errorCount <= 4;
+    overlayTitle.textContent = completed ? 'Has completat totes les obres!' : 'S’ha acabat la partida!';
+    if (validDelivery) {
+      overlayText.innerHTML = `${escapeHtml(playerName)}: ${score} ${score === 1 ? 'punt' : 'punts'}. Errades: ${errorCount}.<div class="delivery-result valid">LLIURAMENT VÀLID<span class="result-detail">Has acabat totes les obres amb un màxim de 4 errades.</span></div>`;
+    } else {
+      const detail = completed
+        ? `Has comès ${errorCount} errades. El màxim permès és 4.`
+        : `Partida incompleta: has classificat ${completedCount} de ${totalInRound} obres. Cal acabar-les totes i tenir com a màxim 4 errades.`;
+      overlayText.innerHTML = `${escapeHtml(playerName)}: ${score} ${score === 1 ? 'punt' : 'punts'}. Errades: ${errorCount}.<div class="delivery-result invalid">⛔ LLIURAMENT NO VÀLID<span class="result-detail">${escapeHtml(detail)}</span></div>`;
+    }
+    saveRecord();
+    startBtn.textContent = 'Torna a jugar';
+    startBtn.style.display = 'inline-block';
+    modeChoices.style.display = 'flex';
+    // Manté el resum de la partida i el nom registrat.
+    overlay.classList.remove('hidden');
+    pauseBtn.textContent = 'Ⅱ';
+  }
+  function start() {
+    const enteredName = playerNameInput.value;
+    if (!enteredName) { playerError.style.display = 'block'; playerNameInput.focus(); return; }
+    playerError.style.display = 'none'; playerName = enteredName;
+    if (current) { current.el.remove(); current = null; }
+    const eligible = artworks.filter(a => mode === 'beginner' || a.advanced !== 'Altres');
+    playQueue = [...eligible];
+    for (let i = playQueue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [playQueue[i], playQueue[j]] = [playQueue[j], playQueue[i]]; }
+    totalInRound = playQueue.length; completedCount = 0;
+    errorCount = 0; correctCount = 0; gameId = makeGameId(); gameStartedAt = Date.now(); gameRecorded = false;
+    score = 0; level = 1; lane = Math.floor(categories.length/2); spawnWait = 0; paused = false; running = true; fastDrop = false;
+    updateStats();
+    overlay.classList.add('hidden');
+    modeChoices.style.display = 'none';
+    pauseBtn.textContent = 'Ⅱ';
+    lastTime = performance.now();
+    spawn();
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+  function togglePause() {
+    if (!running) return;
+    paused = !paused;
+    if (paused) {
+      overlayTitle.textContent = 'Pausa';
+      overlayText.textContent = 'Respira. Quan estiguis a punt, continua la partida.';
+      startBtn.textContent = 'Continua';
+      startBtn.style.display = 'inline-block';
+      modeChoices.style.display = 'none';
+      overlay.classList.remove('hidden');
+      pauseBtn.textContent = '▶';
+    } else {
+      overlay.classList.add('hidden');
+      pauseBtn.textContent = 'Ⅱ';
+      lastTime = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+  }
+  let fastDrop = false;
+  function loop(now) {
+    if (!running || paused) return;
+    const dt = Math.min(40, now - lastTime);
+    lastTime = now;
+    if (current) {
+      current.y += dt * (fastDrop ? 0.55 : (0.035 + level * 0.004));
+      current.el.style.top = current.y + 'px';
+      const landingY = arena.clientHeight - 160;
+      if (current.y >= landingY) {
+        const caught = lane === current.color;
+        const correctCategoryName = categories[current.color]?.name || '—';
+        const missedArtwork = current.artwork;
+        current.el.remove();
+        current = null;
+        artworkFullscreen.style.display = 'none';
+        sackEls.forEach(s => s.classList.remove('active'));
+        const selectedCategoryName = categories[lane]?.name || '—';
+        if (caught) {
+          score++; correctCount++;
+          playSuccessSound();
+          showConfetti();
+          const landedSack = sackEls[lane];
+          landedSack.classList.add('good');
+          setTimeout(() => landedSack.classList.remove('good'), 260);
+        } else {
+          errorCount++;
+          playErrorSound();
+          showErrorFlash();
+          answerFeedback.innerHTML = `❌ <div class="feedback-title">${escapeHtml(missedArtwork?.title || 'Obra no identificada')}</div><img class="feedback-art" src="${escapeHtml(missedArtwork?.url || '')}" alt="${escapeHtml(missedArtwork?.title || 'Imatge de l’obra')}"><div>Resposta correcta: <strong>${escapeHtml(correctCategoryName)}</strong></div>`;
+          answerFeedback.classList.add('show');
+        }
+        logAnswer(missedArtwork, selectedCategoryName, correctCategoryName, caught);
+        completedCount++;
+        updateStats();
+        // Deixa temps perquè l'alumne llegeixi la resposta correcta abans de la següent obra.
+        spawnWait = caught ? 650 : 4000;
+      }
+    } else {
+      spawnWait -= dt;
+      if (spawnWait <= 0) spawn();
+    }
+    raf = requestAnimationFrame(loop);
+  }
+  function chooseMode(nextMode) {
+    mode = nextMode;
+    categories = categorySets[mode];
+    keyQuestions.style.display = mode === 'beginner' ? 'block' : 'none';
+  advancedMap.style.display = mode === 'advanced' ? 'block' : 'none';
+    renderSacks();
+    artworkFullscreen.style.display = 'none';
+    answerFeedback.classList.remove('show');
+    overlayTitle.textContent = mode === 'beginner' ? 'Nivell principiant' : 'Nivell avançat';
+    overlayText.textContent = mode === 'beginner'
+      ? 'Classifica les obres en Romanticisme, Realisme, Goya o Altres.'
+      : 'Classifica les obres en vuit categories: romanticisme francès, anglès, alemany, prerafaelita, natzarè, classicisme, Goya i realisme. Les obres que no corresponen a aquestes categories no apareixen en aquest nivell.';
+    modeChoices.style.display = 'none';
+    startBtn.style.display = 'inline-block';
+    startBtn.textContent = 'Comença a jugar';
+    renderLeaderboard();
+    playerError.style.display = 'none';
+  }
+  beginnerBtn.addEventListener('click', () => chooseMode('beginner'));
+  advancedBtn.addEventListener('click', () => chooseMode('advanced'));
+  startBtn.addEventListener('click', () => {
+    if (running && paused) {
+      paused = false; overlay.classList.add('hidden'); pauseBtn.textContent = 'Ⅱ';
+      lastTime = performance.now(); raf = requestAnimationFrame(loop);
+    } else start();
+  });
+  pauseBtn.addEventListener('click', togglePause);
+  document.getElementById('leftBtn').addEventListener('click', () => move(-1));
+  document.getElementById('rightBtn').addEventListener('click', () => move(1));
+  window.addEventListener('keydown', e => {
+    if (['ArrowLeft','ArrowRight',' ','a','A','d','D'].includes(e.key)) e.preventDefault();
+    if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') move(-1);
+    if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') move(1);
+    if (e.key === ' ' && running && !paused) fastDrop = true;
+  });
+  window.addEventListener('keyup', e => {
+    if (e.key === ' ') fastDrop = false;
+  });
+  window.addEventListener('blur', () => { fastDrop = false; });
+  window.addEventListener('pagehide', () => { if (running && !gameRecorded) logGame(false, 'Pestanya tancada abans d’acabar'); });
+  renderSacks();
+  renderLeaderboard();
+  window.addEventListener('resize', positionSquare);
+})();
+</script>
+</body>
+</html>
