@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Romanticisme vs. Realisme · Fonaments Artístics</title>
+<style>
+:root{--ink:#20233d;--muted:#5b6075;--rom:#a93659;--romlight:#fae8ee;--rea:#225a88;--realight:#e6f1fb;--gold:#e6ad29;--green:#4e754b;--paper:#fbfaf7}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#15172a;color:var(--ink)}
+body{overflow:hidden}.deck{height:100%;display:flex;align-items:center;justify-content:center;padding:22px}
+.slide{display:none;width:min( min(100%, calc((100vh - 44px)*16/9)), 1440px);aspect-ratio:16/9;background:var(--paper);border-radius:18px;overflow:hidden;position:relative;box-shadow:0 18px 70px #0006;padding:clamp(24px,4vw,62px);padding-bottom:clamp(45px,5vw,70px)}
+.slide.active{display:flex;flex-direction:column}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:clamp(10px,.95vw,14px);color:var(--muted);margin-bottom:12px}
+h1,h2,h3,p{margin-top:0}h1{font-family:Georgia,serif;font-size:clamp(38px,5.4vw,82px);line-height:.98;letter-spacing:-.04em;margin-bottom:18px}h2{font-family:Georgia,serif;font-size:clamp(29px,3.5vw,52px);line-height:1.03;margin-bottom:18px;letter-spacing:-.025em}h3{font-size:clamp(16px,1.55vw,23px);margin-bottom:8px}p,li{font-size:clamp(14px,1.45vw,21px);line-height:1.38}p{margin-bottom:12px}.sub{font-size:clamp(17px,1.8vw,26px);color:var(--muted);max-width:850px}.accent{color:var(--rom)}.blue{color:var(--rea)}.pill{display:inline-block;border-radius:99px;padding:7px 13px;font-size:clamp(11px,1vw,15px);font-weight:800;letter-spacing:.04em;background:#fff9}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,3vw,42px);min-height:0;flex:1;align-items:center}.layout.wide{grid-template-columns:1.15fr .85fr}.layout.reverse{grid-template-columns:.85fr 1.15fr}.panel{border-radius:16px;padding:clamp(17px,2vw,28px);height:100%;min-height:0}.pink{background:var(--romlight)}.bluebg{background:var(--realight)}.dark{background:var(--ink);color:#fff}.cream{background:#f4eddf}.greenbg{background:#eaf2e5}.bullets{padding-left:1.15em;margin:0}.bullets li{margin:.48em 0}.key{font-weight:800}.imagebox{height:100%;min-height:0;display:flex;flex-direction:column;justify-content:center}.imagebox img{width:100%;height:100%;max-height:clamp(230px,36vw,490px);object-fit:contain;background:#e8e5df;border-radius:12px}.caption{font-size:clamp(11px,1vw,15px);color:var(--muted);margin-top:8px;text-align:center}.bigquote{font-family:Georgia,serif;font-size:clamp(25px,3.4vw,48px);line-height:1.12;letter-spacing:-.025em}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;flex:1}.card{border-radius:14px;padding:clamp(15px,1.7vw,24px);background:white;border:1px solid #e8e4df}.num{font-size:clamp(27px,3vw,44px);font-family:Georgia,serif;font-weight:bold;color:var(--rom);margin-bottom:10px}.table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:12px;font-size:clamp(12px,1.25vw,18px);background:#fff}.table th,.table td{padding:clamp(8px,1vw,15px);text-align:left;border-bottom:1px solid #e8e8ed}.table th{background:var(--ink);color:white}.table th:nth-child(2){background:var(--rom)}.table th:nth-child(3){background:var(--rea)}.table td:first-child{font-weight:800;width:19%}.table tr:last-child td{border-bottom:0}.footer{position:absolute;left:clamp(24px,4vw,62px);right:clamp(24px,4vw,62px);bottom:18px;display:flex;align-items:center;gap:12px;font-size:12px;color:#73778a}.progress{height:4px;background:#e4e2e7;flex:1;border-radius:10px;overflow:hidden}.progress span{display:block;height:100%;width:0;background:var(--rom);transition:width .25s}.controls{position:fixed;bottom:12px;right:18px;display:flex;gap:8px;z-index:5}.controls button{border:1px solid #ffffff44;background:#292c43;color:white;border-radius:9px;padding:8px 12px;font-size:15px;cursor:pointer}.controls button:hover{background:#444863}.hint{position:absolute;right:clamp(24px,4vw,62px);top:clamp(20px,2.5vw,36px);font-size:12px;color:#7a7d8d}.symbol{font-size:clamp(35px,4.5vw,65px);line-height:1;margin-bottom:16px}.tagline{font-weight:800;font-size:clamp(17px,2vw,28px)}.answer{border-left:5px solid var(--gold);padding:10px 0 10px 18px;margin-top:15px;font-weight:700;font-size:clamp(15px,1.5vw,22px)}.split-title{display:flex;gap:14px;align-items:center}.circle{display:inline-flex;width:42px;height:42px;align-items:center;justify-content:center;border-radius:50%;background:var(--ink);color:white;font-weight:800;flex-shrink:0}
+@media(max-width:700px){.deck{padding:0}.slide{width:100vw;height:100dvh;aspect-ratio:auto;border-radius:0;padding:22px 20px 54px;overflow:auto}.layout,.layout.wide,.layout.reverse{grid-template-columns:1fr;gap:14px}.imagebox img{height:30vh;max-height:300px}.cards{grid-template-columns:1fr}.table{font-size:11px}.table th,.table td{padding:7px}.hint{display:none}.footer{left:20px;right:20px;bottom:14px}.controls{bottom:8px;right:8px}.controls button{padding:7px 10px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+<section class="slide active">
+  <div class="eyebrow">Fonaments Artístics · 2n Batxillerat</div>
+  <div class="layout wide">
+    <div>
+      <span class="pill" style="background:#f4dfe6;color:var(--rom)">PINTURA · SEGLE XIX</span>
+      <h1 style="margin-top:22px">ROMANTICISME<br><span style="color:#77798b;font-size:.55em">vs.</span><br>REALISME</h1>
+      <p class="sub">Dues maneres de mirar i representar el món.</p>
+      <div class="answer">La pregunta clau: què prioritza l’artista —l’expressió dels ideals o l’observació de la realitat?</div>
+    </div>
+    <div class="panel dark" style="display:flex;flex-direction:column;justify-content:center">
+      <div class="symbol">🎭 ↔ 👁️</div>
+      <p class="bigquote">Del món que ens commou<br>al món que observem.</p>
+      <p style="color:#d6d7e1">Observa, compara i argumenta a partir de proves visuals.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">01 · Situem els moviments</div><h2>Dos contextos, dues mirades</h2>
+  <div class="layout">
+    <div class="panel pink">
+      <div class="symbol">🔥</div><h3 class="accent">ROMANTICISME</h3>
+      <p><b>Primera meitat del segle XIX</b></p>
+      <ul class="bullets"><li>Reacció contra el predomini de la raó i les normes rígides.</li><li>Importància de la llibertat individual, la imaginació i el sentiment.</li><li>Interès per les revolucions, la història, l’exotisme i la natura sublim.</li></ul>
+    </div>
+    <div class="panel bluebg">
+      <div class="symbol">🔎</div><h3 class="blue">REALISME</h3>
+      <p><b>Mitjan segle XIX</b></p>
+      <ul class="bullets"><li>Interès per la societat contemporània i els canvis socials.</li><li>Atenció a la vida quotidiana i a les classes populars.</li><li>Rebuig de la idealització i dels temes excessivament heroics.</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">02 · Romanticisme</div>
+  <div class="layout wide">
+    <div>
+      <h2 class="accent">L’art com a expressió</h2>
+      <p class="sub">L’obra vol commoure, impressionar o fer pensar.</p>
+      <ul class="bullets">
+        <li><b>Emoció:</b> passió, por, angoixa, entusiasme.</li>
+        <li><b>Llibertat i rebel·lia:</b> revolucions i lluites.</li>
+        <li><b>Natura sublim:</b> immensitat, força i amenaça.</li>
+        <li><b>Temes extraordinaris:</b> tragèdies, aventures, episodis històrics.</li>
+        <li><b>Dramatisme visual:</b> diagonals, moviment i contrastos de llum.</li>
+      </ul>
+    </div>
+    <div class="imagebox">
+      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg" alt="La llibertat guiant el poble, de Delacroix" onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/a/a7/Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg'">
+      <div class="caption"><b>La llibertat guiant el poble</b> · Eugène Delacroix, 1830<br>Moviment, lluita i exaltació de la llibertat.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">03 · Llegim una obra romàntica</div><h2>Quines proves visuals hi trobem?</h2>
+  <div class="layout">
+    <div class="imagebox">
+      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Eug%C3%A8ne_Delacroix_-_La_libert%C3%A9_guidant_le_peuple.jpg" alt="Detall de La llibertat guiant el poble">
+      <div class="caption">Delacroix · 1830</div>
+    </div>
+    <div class="panel pink">
+      <h3>Observa i identifica</h3>
+      <ul class="bullets"><li>Una figura al·legòrica que guia el poble.</li><li>Composició piramidal i diagonals que creen moviment.</li><li>Contrastos de llum, fum i color.</li><li>Gestos intensos i sensació de lluita.</li></ul>
+      <div class="answer">Conclusió: el fet històric es transforma en una imatge dramàtica i simbòlica de la llibertat.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">04 · Realisme</div>
+  <div class="layout wide">
+    <div>
+      <h2 class="blue">L’art com a observació</h2>
+      <p class="sub">L’obra posa el focus en les persones i les condicions reals de vida.</p>
+      <ul class="bullets">
+        <li><b>Vida quotidiana:</b> treball, camp, ciutat i llar.</li>
+        <li><b>Classes populars:</b> pagesos, obrers i persones corrents.</li>
+        <li><b>Realitat social:</b> desigualtats i condicions laborals.</li>
+        <li><b>Sense idealització:</b> cossos, rostres i entorns concrets.</li>
+        <li><b>Present contemporani:</b> allò que l’artista veu al seu voltant.</li>
+      </ul>
+    </div>
+    <div class="imagebox">
+      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Jean-Fran%C3%A7ois_Millet_-_Gleaners_-_Google_Art_Project_2.jpg" alt="Les espigoladores, de Millet" onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:FilePath/Jean-Fran%C3%A7ois_Millet_-_The_Gleaners.jpg'">
+      <div class="caption"><b>Les espigoladores</b> · Jean-François Millet, 1857<br>Treball rural i protagonisme de les classes populars.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">05 · Llegim una obra realista</div><h2>Què ens explica la realitat representada?</h2>
+  <div class="layout">
+    <div class="imagebox">
+      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Jean-Fran%C3%A7ois_Millet_-_Gleaners_-_Google_Art_Project_2.jpg" alt="Les espigoladores, de Millet" onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:FilePath/Jean-Fran%C3%A7ois_Millet_-_The_Gleaners.jpg'">
+      <div class="caption">Millet · 1857</div>
+    </div>
+    <div class="panel bluebg">
+      <h3>Observa i identifica</h3>
+      <ul class="bullets"><li>Dones que recullen les restes de la collita.</li><li>Postures de treball repetitives i físicament exigents.</li><li>Un paisatge rural i un camp després de la sega.</li><li>Persones treballadores com a protagonistes.</li></ul>
+      <div class="answer">Conclusió: una activitat quotidiana es converteix en tema central de la pintura.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">06 · Comparació</div><h2>Les diferències, d’un cop d’ull</h2>
+  <table class="table">
+    <thead><tr><th>Aspecte</th><th>Romanticisme</th><th>Realisme</th></tr></thead>
+    <tbody>
+      <tr><td>Tema</td><td>Revolucions, tragèdies, aventures, natura sublim</td><td>Treball, vida quotidiana, classes populars</td></tr>
+      <tr><td>Finalitat</td><td>Expressar emocions i ideals</td><td>Mostrar la realitat i la societat</td></tr>
+      <tr><td>Personatges</td><td>Sovint heroics o dramàtics</td><td>Persones corrents</td></tr>
+      <tr><td>Composició</td><td>Dinàmica, dramàtica i expressiva</td><td>Directa i centrada en l’acció quotidiana</td></tr>
+      <tr><td>Realitat</td><td>Transformada per una visió subjectiva</td><td>Representada sense idealització</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">Són tendències generals: no totes les obres encaixen de manera absoluta en cada característica.</p>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">07 · Evitem simplificacions</div><h2>Compte: no tot és tan senzill</h2>
+  <div class="cards">
+    <div class="card"><div class="num">01</div><h3>Un fet real pot ser romàntic</h3><p>La pintura pot transformar un esdeveniment històric amb dramatisme, símbols i emoció.</p></div>
+    <div class="card"><div class="num">02</div><h3>El Realisme també emociona</h3><p>Representar la vida quotidiana no vol dir que l’obra sigui freda o mancada de sentiment.</p></div>
+    <div class="card"><div class="num">03</div><h3>El tema no ho decideix tot</h3><p>Un paisatge o una escena de treball poden tenir tractaments artístics diferents.</p></div>
+  </div>
+  <div class="answer">La clau és valorar conjuntament el tema, la intenció i els recursos visuals.</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">08 · Mètode d’anàlisi</div><h2>Com justificar la classificació d’una obra?</h2>
+  <div class="layout">
+    <div class="panel cream">
+      <div class="split-title"><span class="circle">1</span><h3>Què representa?</h3></div><p>Una situació extraordinària o una escena quotidiana?</p>
+      <div class="split-title"><span class="circle">2</span><h3>Què vol transmetre?</h3></div><p>Emocions i ideals o una mirada sobre la societat?</p>
+      <div class="split-title"><span class="circle">3</span><h3>Com són els personatges?</h3></div><p>Figures heroiques i dramàtiques o persones corrents?</p>
+    </div>
+    <div class="panel greenbg">
+      <div class="split-title"><span class="circle">4</span><h3>Com és la composició?</h3></div><p>Dinàmica i teatral o directa i centrada en l’acció?</p>
+      <div class="split-title"><span class="circle">5</span><h3>Quines proves visuals tens?</h3></div><p>Descriu detalls concrets: gestos, llum, color, espai, postures i accions.</p>
+      <div class="answer">No n’hi ha prou amb posar una etiqueta: cal argumentar-la.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">09 · Practiquem</div><h2>Romàntica o realista?</h2>
+  <p class="sub">Mira cada situació i justifica la resposta amb dues proves visuals.</p>
+  <div class="cards">
+    <div class="card" style="background:var(--romlight)"><div class="num">A</div><h3>Una tempesta al mar</h3><p>Un vaixell lluita contra onades gegants; els supervivents expressen terror i desesperació.</p><p><b>Què hi observes?</b></p></div>
+    <div class="card" style="background:var(--realight)"><div class="num" style="color:var(--rea)">B</div><h3>Una jornada al camp</h3><p>Un grup de jornalers treballa la terra; veiem les eines, les postures i el paisatge quotidià.</p><p><b>Què hi observes?</b></p></div>
+    <div class="card" style="background:#f1eddf"><div class="num" style="color:#8a6a19">C</div><h3>Una revolta popular</h3><p>Una multitud avança entre fum i barricades; una figura alça una bandera i guia el grup.</p><p><b>Què hi observes?</b></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">10 · Conclusió</div>
+  <div style="max-width:1050px;margin:auto">
+    <p class="eyebrow">RECORDA</p>
+    <h1 style="font-size:clamp(38px,5vw,72px)">Romanticisme:<br><span class="accent">sentir i exaltar.</span></h1>
+    <h1 style="font-size:clamp(38px,5vw,72px)">Realisme:<br><span class="blue">observar i representar.</span></h1>
+    <p class="sub" style="margin-top:24px">La classificació més sòlida és la que es fonamenta en detalls concrets de l’obra, no només en el tema.</p>
+  </div>
+</section>
+</div>
+<div class="controls">
+  <button id="prev" aria-label="Diapositiva anterior">←</button>
+  <button id="next" aria-label="Diapositiva següent">→</button>
+  <button id="full" aria-label="Pantalla completa">⛶</button>
+</div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let index=0;
+function show(n){index=(n+slides.length)%slides.length;slides.forEach((s,i)=>s.classList.toggle('active',i===index));document.querySelectorAll('.count').forEach(x=>x.textContent=index+1)}
+document.getElementById('prev').addEventListener('click',()=>show(index-1));
+document.getElementById('next').addEventListener('click',()=>show(index+1));
+document.getElementById('full').addEventListener('click',()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()});
+document.addEventListener('keydown',e=>{if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();show(index+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(index-1)}if(e.key==='Home')show(0);if(e.key==='End')show(slides.length-1)});
+show(0);
+</script>
+</body></html>
